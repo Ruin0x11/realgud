@@ -41,6 +41,11 @@
   :type 'symbolp
   :group 'realgud)
 
+(defcustom realgud-strip-ansi? nil
+"If non-nil, set strip ANSI control characters from output text we see"
+  :type 'symbolp
+  :group 'realgud)
+
 (declare-function fn-p-to-fn?-alias                   'realgud-helper)
 (declare-function realgud-bp-add-info                 'realgud-bp)
 (declare-function realgud-bp-del-info                 'realgud-bp)
@@ -182,7 +187,8 @@ evaluating (realgud-cmdbuf-info-loc-regexp realgud-cmdbuf-info)"
 
   (interactive "r")
   (if (> from to) (psetq to from from to))
-  (let* ((text (buffer-substring-no-properties from to))
+  (let* ((raw-text (buffer-substring-no-properties from to))
+	 (text (if realgud-strip-ansi? (ansi-color-filter-apply raw-text) raw-text))
 	 (loc (realgud-track-loc text cmd-mark))
 	 ;; If we see a selected frame number, it is stored
 	 ;; in frame-num. Otherwise, nil.
